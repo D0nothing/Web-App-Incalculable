@@ -26,8 +26,9 @@ test("goal and rationale share one editorial page", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("link", { name: "Le but & pourquoi", exact: true }).click();
   await expect(page).toHaveURL(/\/but$/);
-  await expect(page.getByText("Garder la main", { exact: true })).toBeVisible();
-  await expect(page.getByText("Un cadre lisible", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Aider sans devenir l’origine de l’acte." })).toBeVisible();
+  await expect(page.getByText("Règle centrale", { exact: true })).toBeVisible();
+  await expect(page.getByText("Calcule pour lui, ne choisis pas à sa place.", { exact: true })).toBeVisible();
 
   await page.goto("/pourquoi");
   await expect(page).toHaveURL(/\/but$/);

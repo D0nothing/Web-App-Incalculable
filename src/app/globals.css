@@ -206,6 +206,13 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .editorial-body section { display: grid; grid-template-columns: 190px 1fr; gap: 30px; padding: 42px 0; border-bottom: 1px solid var(--line); }
 .editorial-body h2 { margin: 0; font-size: .72rem; letter-spacing: .13em; text-transform: uppercase; }
 .editorial-body p { margin: 0; color: #c1c0ba; line-height: 1.75; }
+.editorial-body section > div { display: grid; gap: 20px; }
+.central-formulas p {
+  color: var(--text);
+  font-family: var(--serif);
+  font-size: clamp(1.35rem, 2.5vw, 2rem);
+  line-height: 1.2;
+}
 .editorial-body blockquote { margin: 80px 0 0; font-family: var(--serif); font-size: clamp(2.1rem, 4vw, 3.7rem); line-height: 1.05; }
 
 .document-page { width: 100%; }
