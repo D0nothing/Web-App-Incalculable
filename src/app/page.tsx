@@ -1,8 +1,11 @@
 import { HomeClient } from "@/components/HomeClient";
-import { loadPublicParcheminDocs } from "@/lib/publicDocs";
+import { SiteHeader } from "@/components/SiteHeader";
 
-export default async function HomePage() {
-  const docs = await loadPublicParcheminDocs();
-
-  return <HomeClient manifesto={docs.manifesto} protocol={docs.protocol} />;
+export default function HomePage() {
+  return (
+    <main className="site-shell home-shell">
+      <SiteHeader active="home" />
+      <HomeClient />
+    </main>
+  );
 }

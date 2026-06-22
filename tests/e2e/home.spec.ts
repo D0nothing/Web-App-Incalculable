@@ -1,32 +1,34 @@
 import { expect, test } from "@playwright/test";
 
-test("homepage exposes anchored readers for manifesto and protocol", async ({ page }) => {
+test("homepage keeps the prompt as its only central content", async ({ page }) => {
   await page.goto("/");
 
   await expect(page.getByRole("navigation", { name: "Navigation principale" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Avant le prompt, il y a toi." })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Qu’avez-vous en tête ?" })).toBeVisible();
+  await expect(page.getByPlaceholder("Écrivez ici…")).toBeVisible();
+  await expect(page.locator(".doc-shell")).toHaveCount(0);
+  await expect(page.locator(".editorial-page")).toHaveCount(0);
+});
 
-  const manifestoPanel = page.locator(".info-panel").filter({ hasText: "Lecture complète du document 1" });
-  const protocolPanel = page.locator(".info-panel").filter({ hasText: "Lecture complète du document 2" });
+test("manifesto and protocol live on separate anchored pages", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("link", { name: "Manifeste", exact: true }).click();
+  await expect(page).toHaveURL(/\/manifeste$/);
 
-  await expect(manifestoPanel).toBeVisible();
-  await expect(protocolPanel).toBeVisible();
-
-  const manifestoLinks = manifestoPanel.locator(".doc-nav-link");
-  const protocolLinks = protocolPanel.locator(".doc-nav-link");
-
+  const manifestoLinks = page.locator(".doc-nav-link");
   expect(await manifestoLinks.count()).toBeGreaterThan(3);
-  expect(await protocolLinks.count()).toBeGreaterThan(5);
-
-  const manifestoLink = manifestoLinks.first();
-  const manifestoHref = await manifestoLink.getAttribute("href");
-
-  await manifestoLink.click();
+  const manifestoHref = await manifestoLinks.first().getAttribute("href");
+  await manifestoLinks.first().click();
   await expect(page).toHaveURL(new RegExp(`${manifestoHref?.replace("#", "\\#")}`));
 
-  const protocolLink = protocolLinks.first();
-  const protocolHref = await protocolLink.getAttribute("href");
+  await page.getByRole("link", { name: "Protocole", exact: true }).click();
+  await expect(page).toHaveURL(/\/protocole$/);
+  expect(await page.locator(".doc-nav-link").count()).toBeGreaterThan(5);
+});
 
-  await protocolLink.click();
-  await expect(page).toHaveURL(new RegExp(`${protocolHref?.replace("#", "\\#")}`));
+test("secondary editorial pages are reachable from the header", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("link", { name: "Pourquoi", exact: true }).click();
+  await expect(page).toHaveURL(/\/pourquoi$/);
+  await expect(page.getByRole("heading", { name: "Parce qu’une réponse n’est jamais neutre." })).toBeVisible();
 });

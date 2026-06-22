@@ -4,7 +4,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Incalculable",
-  description: "Interface web pour mobile et desktop avec Parchemin editable"
+  description: "Une interface pour utiliser l’intelligence artificielle sans perdre la main."
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
