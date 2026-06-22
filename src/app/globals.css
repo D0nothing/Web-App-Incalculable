@@ -129,7 +129,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .prompt-object {
   position: relative;
-  padding: 14px 14px 12px;
+  padding: 10px;
   background: linear-gradient(145deg, rgba(255,255,255,.055), rgba(255,255,255,.025));
   border: 1px solid var(--line);
   border-radius: 26px;
@@ -173,13 +173,6 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .send-button:hover { transform: rotate(7deg) scale(1.04); }
 .send-button:disabled { opacity: .5; cursor: wait; }
-
-.prompt-tools { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 2px 0; }
-.action-row { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 2px; }
-.upload-button { display: inline-flex; white-space: nowrap; }
-.upload-button input { display: none; }
-.prompt-status { margin: 8px 10px 0; color: #6d6c68; font-size: .72rem; }
-.document-summary { margin: 5px 10px 0; color: var(--muted); font-size: .72rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .conversation-panel { margin-top: 54px; padding-top: 26px; border-top: 1px solid var(--line); }
 .chat-thread { display: grid; gap: 18px; }
@@ -245,8 +238,6 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .chip { flex: 0 0 auto; padding: 9px 11px; }
   .prompt-stage { min-height: calc(100vh - 79px); padding-top: clamp(58px, 10vh, 94px); }
   .prompt-intro { margin-bottom: 34px; }
-  .prompt-tools { align-items: flex-start; flex-direction: column; }
-  .action-row { justify-content: flex-start; }
   .editorial-hero, .document-hero { display: block; }
   .folio { margin-bottom: 46px; }
   .editorial-hero h1, .document-hero h1 { max-width: none; }

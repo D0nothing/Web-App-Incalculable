@@ -1,25 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
-import { ActionButtons } from "@/components/ActionButtons";
 import { ChatThread } from "@/components/ChatThread";
 import { PromptBox } from "@/components/PromptBox";
-import { UploadButton } from "@/components/UploadButton";
-import type { ChatAction, ChatMessage } from "@/lib/types";
+import type { ChatMessage } from "@/lib/types";
 
 export function HomeClient() {
   const [prompt, setPrompt] = useState("");
-  const [action, setAction] = useState<ChatAction>("normal");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [documentText, setDocumentText] = useState<string | undefined>();
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState("Prêt à commencer.");
-
-  const documentSummary = useMemo(() => {
-    if (!documentText) return null;
-    return `${documentText.slice(0, 90)}${documentText.length > 90 ? "…" : ""}`;
-  }, [documentText]);
 
   async function handleSubmit() {
     if (!prompt.trim()) {
@@ -40,7 +31,7 @@ export function HomeClient() {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: prompt, action, documentText })
+        body: JSON.stringify({ message: prompt, action: "normal" })
       });
       const data = (await response.json()) as { reply?: string; error?: string };
       if (!response.ok) throw new Error(data.error ?? "La requête a échoué.");
@@ -58,12 +49,6 @@ export function HomeClient() {
     }
   }
 
-  async function handleFileSelected(file: File | null) {
-    if (!file) return;
-    setDocumentText(await file.text());
-    setStatus(`Document chargé : ${file.name}`);
-  }
-
   return (
     <section className="prompt-stage">
       <div className="prompt-intro">
@@ -73,12 +58,7 @@ export function HomeClient() {
 
       <div className="prompt-object">
         <PromptBox value={prompt} onChange={setPrompt} onSubmit={handleSubmit} isLoading={isLoading} />
-        <div className="prompt-tools">
-          <UploadButton onFileSelected={handleFileSelected} />
-          <ActionButtons action={action} onChange={setAction} />
-        </div>
-        <p className="prompt-status" role="status">{status}</p>
-        {documentSummary ? <p className="document-summary">{documentSummary}</p> : null}
+        <p className="sr-only" role="status">{status}</p>
       </div>
 
       {messages.length > 0 ? (

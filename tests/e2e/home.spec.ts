@@ -1,34 +1,34 @@
 import { expect, test } from "@playwright/test";
 
-test("homepage keeps the prompt as its only central content", async ({ page }) => {
+test("homepage exposes only the essential prompt interface", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.getByRole("navigation", { name: "Navigation principale" })).toBeVisible();
+  const navigation = page.getByRole("navigation", { name: "Navigation principale" });
+  await expect(navigation).toBeVisible();
+  await expect(navigation.getByRole("link")).toHaveCount(2);
+  await expect(navigation.getByRole("link", { name: "Prompt", exact: true })).toBeVisible();
+  await expect(navigation.getByRole("link", { name: "Le but & pourquoi", exact: true })).toBeVisible();
+
   await expect(page.getByRole("heading", { name: "Qu’avez-vous en tête ?" })).toBeVisible();
   await expect(page.getByPlaceholder("Écrivez ici…")).toBeVisible();
-  await expect(page.locator(".doc-shell")).toHaveCount(0);
-  await expect(page.locator(".editorial-page")).toHaveCount(0);
+  await expect(page.getByText("Importer un .txt ou .md")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Normal" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Reponse plus directe" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Verifier" })).toHaveCount(0);
 });
 
-test("manifesto and protocol live on separate anchored pages", async ({ page }) => {
+test("wordmark links to incalculable.ai", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("link", { name: "Manifeste", exact: true }).click();
-  await expect(page).toHaveURL(/\/manifeste$/);
-
-  const manifestoLinks = page.locator(".doc-nav-link");
-  expect(await manifestoLinks.count()).toBeGreaterThan(3);
-  const manifestoHref = await manifestoLinks.first().getAttribute("href");
-  await manifestoLinks.first().click();
-  await expect(page).toHaveURL(new RegExp(`${manifestoHref?.replace("#", "\\#")}`));
-
-  await page.getByRole("link", { name: "Protocole", exact: true }).click();
-  await expect(page).toHaveURL(/\/protocole$/);
-  expect(await page.locator(".doc-nav-link").count()).toBeGreaterThan(5);
+  await expect(page.getByRole("link", { name: "Visiter incalculable.ai" })).toHaveAttribute("href", "https://incalculable.ai/");
 });
 
-test("secondary editorial pages are reachable from the header", async ({ page }) => {
+test("goal and rationale share one editorial page", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("link", { name: "Pourquoi", exact: true }).click();
-  await expect(page).toHaveURL(/\/pourquoi$/);
-  await expect(page.getByRole("heading", { name: "Parce qu’une réponse n’est jamais neutre." })).toBeVisible();
+  await page.getByRole("link", { name: "Le but & pourquoi", exact: true }).click();
+  await expect(page).toHaveURL(/\/but$/);
+  await expect(page.getByText("Garder la main", { exact: true })).toBeVisible();
+  await expect(page.getByText("Un cadre lisible", { exact: true })).toBeVisible();
+
+  await page.goto("/pourquoi");
+  await expect(page).toHaveURL(/\/but$/);
 });
