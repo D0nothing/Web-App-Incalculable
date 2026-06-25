@@ -30,6 +30,8 @@ export type ParcheminSource = "file" | "database";
 export type ParcheminRegistryConfig = {
   source: ParcheminSource;
   filePath?: string;
+  filePaths?: string[];
+  editable?: boolean;
 };
 
 export type ChatRequestBody = {

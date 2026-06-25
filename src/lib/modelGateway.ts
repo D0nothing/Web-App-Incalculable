@@ -1,20 +1,5 @@
 import type { ChatAction, PolicyDecision } from "./types";
-
-type LlmConfig = {
-  provider: string;
-  model: string;
-  apiKey?: string;
-  baseUrl: string;
-};
-
-function getLlmConfig(): LlmConfig {
-  return {
-    provider: process.env.LLM_PROVIDER ?? "openai",
-    model: process.env.LLM_MODEL ?? "gpt-4.1-mini",
-    apiKey: process.env.LLM_API_KEY,
-    baseUrl: process.env.LLM_BASE_URL ?? "https://api.openai.com/v1"
-  };
-}
+import { getLlmConfig } from "./llmConfig";
 
 export async function generateAssistantReply(input: {
   message: string;

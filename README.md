@@ -1,58 +1,89 @@
 # Incalculable
 
-Application web Next.js pensée pour une expérience PC et mobile, avec un Parchemin éditable côté serveur et une exposition publique en lecture seule.
+Application web Next.js pour PC et mobile, avec une interface tres epuree, un prompt central et un Parchemin modifiable cote serveur.
 
-## Objectif
-
-Le projet sépare trois choses:
-
-- l’expérience publique, qui présente la position d’Incalculable et expose les documents fondateurs;
-- le Parchemin actif, chargé côté serveur avant chaque réponse IA;
-- la page admin, réservée à l’édition du Parchemin.
-
-## Démarrage local
+## Demarrage local
 
 ```bash
 npm install
 npm run dev
 ```
 
-L’app est disponible sur `http://localhost:3000`.
+L'application est disponible sur `http://localhost:3000`.
 
-## Configuration IA
+## Configuration API / modele
 
-Copie `.env.example` vers `.env.local` puis ajuste les variables:
+La configuration se fait dans `.env.local`.
+
+Le plus simple:
+
+1. Copier `.env.example` en `.env.local`
+2. Remplir la cle API
+3. Redemarrer `npm run dev`
 
 ```env
-LLM_PROVIDER=openai
-LLM_MODEL=gpt-4.1-mini
-LLM_API_KEY=
-LLM_BASE_URL=https://api.openai.com/v1
+LLM_PROVIDER=big-pickle
+LLM_MODEL=big-pickle
+LLM_API_KEY=ta_cle_api
+LLM_BASE_URL=https://opencode.ai/zen/v1
 ```
 
-Si `LLM_API_KEY` est vide, l’application garde une réponse simulée.
+L'application appelle ensuite:
+
+```text
+POST {LLM_BASE_URL}/chat/completions
+```
+
+avec le modele indique dans `LLM_MODEL`.
+
+Si `LLM_API_KEY` est vide, l'application garde une reponse simulee. C'est utile pour tester l'interface sans consommer d'API.
+
+### Variables dediees Big Pickle
+
+Tu peux aussi utiliser ces variables, si tu preferes garder le nom du fournisseur visible:
+
+```env
+LLM_PROVIDER=big-pickle
+OPENCODE_API_KEY=ta_cle_api
+OPENCODE_BASE_URL=https://opencode.ai/zen/v1
+BIG_PICKLE_MODEL=big-pickle
+```
+
+Les variables generiques `LLM_MODEL`, `LLM_API_KEY` et `LLM_BASE_URL` restent prioritaires si elles sont definies.
+
+## Dossier Parchemin
+
+Le dossier important est:
+
+```text
+parchemin/
+```
+
+Il contient maintenant les sources protegees du Parchemin:
+
+- `01-Contexte d'intention ( Manifesto ).md`
+- `02- Colonne vertéblrale (coeur-invariant).md`
+- `03-Protocole de fonctionnement ( runtime).yaml`
+- `04- Tests.yaml`
+- `README.md` : aide rapide sur le dossier
+
+Ces 4 fichiers sont lus dans cet ordre et assembles cote serveur avant l'appel au modele.
+
+Regle de protection: ces fichiers ne doivent pas etre modifies, renommes ou reformates sans autorisation explicite.
+
+Ne jamais mettre de cle API dans ce dossier.
 
 ## Structure importante
 
-- `config/parchemin.md` : Parchemin actif chargé côté serveur
-- `config/public/1-manifeste.md` : document public exposé en lecture seule
-- `config/public/2-protocole.md` : document public exposé en lecture seule
-- `src/lib/publicDocs.ts` : lecture et découpage des documents publics
+- `parchemin/01...` a `parchemin/04...` : Parchemin actif charge cote serveur
+- `config/public/1-manifeste.md` : document public expose en lecture seule
+- `config/public/2-protocole.md` : document public expose en lecture seule
+- `src/lib/llmConfig.ts` : configuration du fournisseur IA
+- `src/lib/modelGateway.ts` : appel API compatible `/chat/completions`
 - `src/lib/parcheminRegistry.ts` : chargement / sauvegarde du Parchemin actif
-- `src/lib/promptBuilder.ts` : assemblage du prompt système
+- `src/lib/promptBuilder.ts` : assemblage du prompt systeme
 - `src/app/api/chat/route.ts` : endpoint de conversation
-- `src/app/api/parchemin/public/route.ts` : endpoint des documents publics
 - `src/app/admin/parchemin/page.tsx` : interface admin minimale
-
-## Parcours public
-
-La page d’accueil propose:
-
-- des boutons en haut pour naviguer entre les sections;
-- une lecture complète du manifeste et du protocole;
-- un lecteur avec ancres pour parcourir les longues sections;
-- un chat en bas de page;
-- l’import de fichiers `.txt` et `.md`.
 
 ## Tests
 
@@ -62,33 +93,22 @@ npm run test:e2e
 npm run build
 ```
 
-Les tests unitaires couvrent:
+## Deploiement Vercel
 
-- le parseur de documents;
-- la classification de politique;
-- le chargement des documents publics.
+Sur Vercel, ajouter les memes variables d'environnement que dans `.env.local`:
 
-Le test E2E vérifie:
-
-- le rendu de la page d’accueil;
-- les lecteurs de documents publics;
-- la navigation par ancres.
-
-## Déploiement Vercel
-
-Le dépôt est prêt pour Vercel dès que le repo GitHub est connecté au projet Vercel.
-
-Bon réflexe avant un déploiement:
-
-```bash
-npm run build
-npm run test:unit
-npm run test:e2e
+```env
+LLM_PROVIDER=big-pickle
+LLM_MODEL=big-pickle
+LLM_API_KEY=ta_cle_api
+LLM_BASE_URL=https://opencode.ai/zen/v1
 ```
 
-## Notes d’architecture
+Puis redeployer.
 
-- Le Parchemin n’est pas codé en dur dans `promptBuilder.ts`.
-- Le contenu public est exposé sans possibilité de modification depuis l’interface publique.
-- La page admin reste séparée de l’expérience utilisateur principale.
-- Le menu latéral et les ancres servent à naviguer dans les documents longs sans quitter la page.
+## Notes d'architecture
+
+- Le Parchemin n'est pas code en dur dans `promptBuilder.ts`.
+- Le modele se configure par variables d'environnement.
+- L'API attend un fournisseur compatible avec le format OpenAI `/chat/completions`.
+- Les documents publics restent separes des instructions serveur.
