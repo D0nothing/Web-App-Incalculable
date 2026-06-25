@@ -1,5 +1,5 @@
-import type { ChatAction, PolicyDecision } from "./types";
 import { getLlmConfig } from "./llmConfig";
+import type { ChatAction, PolicyDecision } from "./types";
 
 export async function generateAssistantReply(input: {
   message: string;
@@ -9,48 +9,41 @@ export async function generateAssistantReply(input: {
   documentText?: string;
 }): Promise<string> {
   const config = getLlmConfig();
-  const prefix =
-    input.action === "more_direct"
-      ? "Reponse directe"
-      : input.action === "verify"
-        ? "Verification"
-        : "Reponse";
 
-  if (config.apiKey) {
-    const response = await fetch(`${config.baseUrl.replace(/\/$/, "")}/chat/completions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${config.apiKey}`
-      },
-      body: JSON.stringify({
-        model: config.model,
-        messages: [
-          { role: "system", content: input.systemPrompt },
-          { role: "user", content: input.message }
-        ],
-        temperature: 0.2
-      })
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`LLM request failed: ${response.status} ${errorText}`);
-    }
-
-    const payload = (await response.json()) as {
-      choices?: Array<{ message?: { content?: string } }>;
-    };
-    const content = payload.choices?.[0]?.message?.content?.trim();
-
-    if (!content) {
-      throw new Error("LLM response did not contain any assistant text.");
-    }
-
-    return content;
+  if (!config.apiKey) {
+    throw new Error("Big Pickle API key is missing. Add LLM_API_KEY in .env.local or in Vercel environment variables.");
   }
 
-  const documentNote = input.documentText ? " Un document a ete pris en compte." : "";
+  const response = await fetch(`${config.baseUrl.replace(/\/$/, "")}/chat/completions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${config.apiKey}`
+    },
+    body: JSON.stringify({
+      model: config.model,
+      messages: [
+        { role: "system", content: input.systemPrompt },
+        { role: "user", content: input.message }
+      ],
+      temperature: 0.2,
+      max_tokens: 1200
+    })
+  });
 
-  return `${prefix} simulée (${config.provider}/${config.model}) : ${input.message.trim() || "message vide"}.${documentNote} Politique active: engagement=${input.policy.engagementLevel}, friction=${input.policy.friction}.`;
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Big Pickle request failed: ${response.status} ${errorText}`);
+  }
+
+  const payload = (await response.json()) as {
+    choices?: Array<{ message?: { content?: string } }>;
+  };
+  const content = payload.choices?.[0]?.message?.content?.trim();
+
+  if (!content) {
+    throw new Error("Big Pickle response did not contain any assistant text.");
+  }
+
+  return content;
 }

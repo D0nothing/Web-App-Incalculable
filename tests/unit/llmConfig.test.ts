@@ -10,7 +10,6 @@ afterEach(() => {
 
 describe("llm config", () => {
   it("uses the simple Big Pickle configuration", () => {
-    process.env.LLM_PROVIDER = "big-pickle";
     process.env.LLM_MODEL = "big-pickle-test";
     process.env.LLM_API_KEY = "test-key";
     process.env.LLM_BASE_URL = "https://opencode.test/v1";
@@ -27,7 +26,6 @@ describe("llm config", () => {
     delete process.env.LLM_MODEL;
     delete process.env.LLM_API_KEY;
     delete process.env.LLM_BASE_URL;
-    process.env.LLM_PROVIDER = "big-pickle";
     process.env.BIG_PICKLE_MODEL = "big-pickle-lab";
     process.env.OPENCODE_API_KEY = "opencode-key";
     process.env.OPENCODE_BASE_URL = "https://opencode.ai/zen/v1";

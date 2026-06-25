@@ -36,7 +36,7 @@ POST {LLM_BASE_URL}/chat/completions
 
 avec le modele indique dans `LLM_MODEL`.
 
-Si `LLM_API_KEY` est vide, l'application garde une reponse simulee. C'est utile pour tester l'interface sans consommer d'API.
+Si `LLM_API_KEY` est vide, l'application renvoie une erreur claire. Il n'y a plus de reponse simulee: les prompts passent directement par Big Pickle.
 
 ### Variables dediees Big Pickle
 
@@ -109,6 +109,6 @@ Puis redeployer.
 ## Notes d'architecture
 
 - Le Parchemin n'est pas code en dur dans `promptBuilder.ts`.
-- Le modele se configure par variables d'environnement.
-- L'API attend un fournisseur compatible avec le format OpenAI `/chat/completions`.
+- Le modele cible est Big Pickle.
+- L'API attend le format `/chat/completions` expose par OpenCode Zen.
 - Les documents publics restent separes des instructions serveur.
